@@ -6,7 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
+
+import analysis.Analysis;
 import buildDevelopmentSets.DomainSpecificSubset;
+import nonAdaptiveSimilarity.CommonSimilarityFunctions;
+
 
 public class Entry {
 
@@ -38,11 +42,97 @@ public class Entry {
 	
 	
 	public static void main(String[] args){
-		nonAdaptiveSimilarity.Jaccard.withAlphaPreprocessing(
-				randomNonDuplicates, outerPath+"jaccard\\f-db-rand-nonDups-Alpha-jaccard");
-		
+	//	nonAdaptiveSimilarity.LogTFIDF.withoutAlphaPreprocessing(civilParishDuplicates,
+		//	civilParishNonDuplicates, 
+	//		outerPath+"nonAdaptive\\logtfidf\\f-db-civilParish-dups-woAlpha-logtfidf",
+	//		outerPath+"nonAdaptive\\logtfidf\\f-db-civilParish-nonDups-woAlpha-logtfidf");
+		buildTFIDFAnalysisFiles();
+		buildRecallPrecisionFilesTFIDF();
 	}
 	
+	/*
+	 * A 'script' that calls Analysis.printRecallPrecisionFMeasure 
+	 * on the 12 files output by Analysis.basicAnalysis in nonAdaptive\\analyses
+	 */
+	static void buildRecallPrecisionFilesHybridJaccard(){
+		String prefix=outerPath+"nonAdaptive\\analyses\\f-db-";
+		String[] datasets={"rand-","iceHockey-","civilParish-"};
+		String[] alphas={"Alpha-", "woAlpha-"};
+		String[] methods={"jaccard", "hybrid"};
+		for(String dataset: datasets)
+			for(String alpha: alphas)
+				for(String method: methods)
+					Analysis.printRecallPrecisionFMeasure(prefix+dataset+"basicAnalysis-"+alpha+method, 
+							prefix+dataset+"recPrecFM-"+alpha+method+".csv");
+	}
+	
+	/*
+	 * A 'script' that calls Analysis.basicAnalysis on the 24 files in nonAdaptive
+	 * 
+	 * Note that, since running this 'script', we've done some moving around
+	 * and hybrid and jaccard files are now in their separate folders (in nonAdaptive)
+	 * Thus, if this code needs to be re-run, the prefixInput will have to
+	 * be appropriately modified. Otherwise, everything is fine.
+	 */
+	static void buildAnalysisFiles(){
+		String prefixInput=outerPath+"nonAdaptive\\f-db-";
+		String prefixOutput=outerPath+"nonAdaptive\\analyses\\f-db-";
+		String[] datasets={"rand-","iceHockey-","civilParish-"};
+		String dup="dups-";
+		String nondup="nonDups-";
+		String[] alphas={"Alpha-", "woAlpha-"};
+		String[] methods={"jaccard", "hybrid"};
+		for(String dataset: datasets)
+			for(String alpha: alphas)
+				for(String method: methods)
+					Analysis.basicAnalysis(prefixInput+dataset+dup+alpha+method, 
+							prefixInput+dataset+nondup+alpha+method, 
+							prefixOutput+dataset+"basicAnalysis-"+alpha+method);
+	}
+	
+	/*
+	 * A 'script' that calls Analysis.printRecallPrecisionFMeasure
+	 * on the 6 tfidf files output by Analysis.basicAnalysis in nonAdaptive\\analyses
+	 */
+	static void buildRecallPrecisionFilesTFIDF(){
+		String prefix=outerPath+"nonAdaptive\\analyses\\f-db-";
+		String[] datasets={"rand-","iceHockey-","civilParish-"};
+		String[] alphas={"woAlpha-"};
+		String[] methods={"logtfidf"};
+		for(String dataset: datasets)
+			for(String alpha: alphas)
+				for(String method: methods)
+					Analysis.printRecallPrecisionFMeasure(prefix+dataset+"basicAnalysis-"+alpha+method, 
+							prefix+dataset+"recPrecFM-"+alpha+method+".csv");
+	}
+
+	/*
+	 * A 'script' that calls Analysis.basicAnalysis on the 6 files in nonAdaptive/logtfidf
+	 * 
+	 */
+	static void buildTFIDFAnalysisFiles(){
+		String prefixInput=outerPath+"nonAdaptive\\logtfidf\\f-db-";
+		String prefixOutput=outerPath+"nonAdaptive\\analyses\\f-db-";
+		String[] datasets={"rand-","iceHockey-","civilParish-"};
+		String dup="dups-";
+		String nondup="nonDups-";
+		String[] alphas={"woAlpha-"};
+		String[] methods={"logtfidf"};
+		for(String dataset: datasets)
+			for(String alpha: alphas)
+				for(String method: methods)
+					Analysis.basicAnalysisTFIDF(prefixInput+dataset+dup+alpha+method, 
+							prefixInput+dataset+nondup+alpha+method, 
+							prefixOutput+dataset+"basicAnalysis-"+alpha+method);
+	}
+
+	/*
+	 * This function is going to be very fluid. 
+	 */
+	static void testThings(){
+		
+	}
+
 	public static List<String> fetchFirstNLines(String file, int n){
 		List<String> lines=new ArrayList<String>();
 		Scanner in=null;
@@ -76,23 +166,6 @@ public class Entry {
 		}finally{in.close();}
 		
 	}
-	
-	/*
-	 * This function is going to be very fluid. 
-	 */
-	private static void testThings(){
-		List<String> lines=fetchFirstNLines(freebaseDbpediaAppend, 100);
-		for(String line: lines){
-			Set<String> typePairs=
-					DomainSpecificSubset.typePairs(line);
-			if(typePairs==null)
-				continue;
-			System.out.println("For line: \n"+line);
-			for(String typePair: typePairs)
-				System.out.println(typePair);
-		}
-	}
-	
 	
 	/**
 	 * Prints the number of lines in file
