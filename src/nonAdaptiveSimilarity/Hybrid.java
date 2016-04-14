@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
@@ -128,6 +129,21 @@ public class Hybrid {
 			result+=max;
 		}
 		return result/primary.size();
+	}
+	
+	/*
+	 * The token lists are computed like they are in with/withoutAlphaPreprocessing
+	 * except we use all the sets. Pairwise score computation is done by calling
+	 * computeHybrid. This function is expected to be used primarily by
+	 * the classifiers in adaptiveSimilarity.
+	 */
+	public static ArrayList<Double> computeHybridFeatureVector(ArrayList<HashSet<String>> dbpediaTokens, ArrayList<HashSet<String>> freebaseTokens){
+		ArrayList<Double> result=new ArrayList<Double>(dbpediaTokens.size()*freebaseTokens.size());
+		for(int i=0; i<dbpediaTokens.size(); i++)
+			for(int j=0; j<freebaseTokens.size(); j++)
+				result.add(computeHybrid(dbpediaTokens.get(i),freebaseTokens.get(j)));
+				
+		return result;
 	}
 	
 }

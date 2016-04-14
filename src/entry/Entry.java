@@ -25,7 +25,7 @@ public class Entry {
 	
 	static String randomDuplicates=outputPath+"freebaseDbpediaDuplicatesRandom10000";
 	static String randomNonDuplicates=outputPath+"freebaseDbpediaNonDuplicatesRandom10000";
-	
+	static int randomNumLines=10000;
 	
 	static String iceHockeyDuplicates=outputPath+"freebaseDbpediaDuplicatesIceHockey8044";
 	static String iceHockeyNonDuplicates=outputPath+"freebaseDbpediaNonDuplicatesIceHockey8044";
@@ -42,12 +42,8 @@ public class Entry {
 	
 	
 	public static void main(String[] args){
-	//	nonAdaptiveSimilarity.LogTFIDF.withoutAlphaPreprocessing(civilParishDuplicates,
-		//	civilParishNonDuplicates, 
-	//		outerPath+"nonAdaptive\\logtfidf\\f-db-civilParish-dups-woAlpha-logtfidf",
-	//		outerPath+"nonAdaptive\\logtfidf\\f-db-civilParish-nonDups-woAlpha-logtfidf");
-		buildTFIDFAnalysisFiles();
-		buildRecallPrecisionFilesTFIDF();
+	
+		//Experiments.GPOnePercent();
 	}
 	
 	/*
