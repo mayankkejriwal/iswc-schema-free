@@ -2,6 +2,7 @@ package entry;
 
 import adaptiveSimilarity.FeatureType;
 import adaptiveSimilarity.GPClassifier;
+import analysis.Analysis;
 
 public class Experiments {
 /**
@@ -9,7 +10,7 @@ public class Experiments {
  * experimental files. All experiments must be done in trials of 10.
  */
 	static String outputFolder="C:\\Users\\Mayank\\SkyDrive\\Documents\\experiments\\"
-			+ "iswc-schema-free\\adaptive\\GP\\training-size-1-percent\\iceHockey\\";
+			+ "iswc-schema-free\\adaptive\\GP\\training-size-1-percent\\random\\";
 	/*
 	 * Run GPclassifier and use 1% of data for training. Values
 	 * used in this function will have to be changed depending
@@ -21,7 +22,7 @@ public class Experiments {
 		int numLines=Entry.iceHockeyNumTypePairs;
 		int trainingSetSize=(int) (0.01*numLines);
 		System.out.println("Training set size is "+trainingSetSize);	
-		
+		/*
 		for(int i=1; i<=10; i++){
 			GPClassifier g=new GPClassifier(dupFile, nonDupFile,
 					numLines, trainingSetSize, FeatureType.ALPHA_JACCARD);
@@ -65,8 +66,8 @@ public class Experiments {
 			g.printTestResults(dupFile, outputFolder+"non-alpha-hybrid\\dup-trial-"+i, 
 					nonDupFile, outputFolder+"non-alpha-hybrid\\nonDup-trial-"+i);
 		
-			}
-			/*
+			}*/
+			
 			for(int i=1; i<=10; i++){
 				GPClassifier g=new GPClassifier(dupFile, nonDupFile,
 						numLines, trainingSetSize, FeatureType.CONCATENATE_HYBRID);
@@ -74,6 +75,24 @@ public class Experiments {
 				g.printTestResults(dupFile, outputFolder+"concatenate-hybrid\\dup-trial-"+i, 
 						nonDupFile, outputFolder+"concatenate-hybrid\\nonDup-trial-"+i);
 			
-				}*/
+				}
+			
+			
+	}
+	
+	/*
+	 * Call this once for each of the development sets. Make sure to change the
+	 * outputfolder! 
+	 */
+	public static void analysis(){
+		String[] featureTypes={"alpha-jaccard", "non-alpha-jaccard", "concatenate-jaccard",
+				"alpha-hybrid", "non-alpha-hybrid", "concatenate-hybrid"};
+		for(String featureType: featureTypes){
+			String folder=outputFolder+featureType+"\\";
+			String outfile=outputFolder+featureType+".csv";
+			double[] minMax=Analysis.returnMinMax(folder);
+			Analysis.adaptivePrintRecPrecFM(folder, outfile, minMax[0], 
+					minMax[1], 0.02);
+		}
 	}
 }
