@@ -43,9 +43,9 @@ public class Entry {
 	
 	public static void main(String[] args){
 			
-		Experiments.analysis();
+		Experiments.analysisTransferLearning();
 		
-		//Experiments.GPOnePercent();
+		//Experiments.GPOnePercentTransfer();
 	}
 	
 	/*

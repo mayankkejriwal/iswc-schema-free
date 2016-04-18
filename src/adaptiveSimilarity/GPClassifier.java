@@ -175,7 +175,74 @@ public class GPClassifier {
 	}
 	
 	
-	/*remember, the last attribute is the classAttribute, which we declare to be numeric
+	/*
+	 * This function is specifically designed for transfer learning experiments.
+	 * Thus, the 'files' are separate from the ones from which the
+	 * training sets were chosen. For this reason, I've made the function
+	 * static, and it now takes a classifier and featureType as input.
+	 * 
+	 * Be careful here; the 'score' will not necessarily be in the [0,1] range.
+	 * The GP will directly try to predict the numeric class 'value', not the probability
+	 * of a categorical class.
+	 */
+	public static void printTestResults(String duplicatesFile, String duplicatesResultsFile, 
+			String nonDuplicatesFile, String nonDuplicatesResultsFile,
+			Classifier classifier, FeatureType featureType){
+		Scanner in=null;
+		PrintWriter out=null;
+		
+		try{
+			in=new Scanner(new FileReader(duplicatesFile));
+			out=new PrintWriter(new File(duplicatesResultsFile));
+			
+			while(in.hasNextLine()){
+				String line=in.nextLine();
+				
+				ArrayList<Double> featureVector=GeneralFunctions.buildFeatureVector(featureType, line);
+				featureVector.add(-1.0);
+				FastVector attributes=createAttributes(featureVector.size());
+				Instances test=new Instances("instances", attributes, 1);
+				test.add(new Instance(1.0,developmentSet.Weka.convertToArray(featureVector)));
+				test.setClassIndex(test.numAttributes() - 1);
+				double[] distr=classifier.distributionForInstance(test.instance(0));
+				if(distr.length!=1)
+					System.out.println("distr. length "+distr.length);
+				out.println(line.split("\t")[0]+"\t"+distr[0]);
+				
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{in.close(); out.close();}
+		
+		System.out.println("Finished classification on duplicates file");
+		try{
+			in=new Scanner(new FileReader(nonDuplicatesFile));
+			out=new PrintWriter(new File(nonDuplicatesResultsFile));
+			
+			while(in.hasNextLine()){
+				String line=in.nextLine();
+				
+						
+				ArrayList<Double> featureVector=GeneralFunctions.buildFeatureVector(featureType, line);
+				featureVector.add(-1.0);
+				FastVector attributes=createAttributes(featureVector.size());
+				Instances test=new Instances("instances", attributes, 1);
+				test.add(new Instance(1.0,developmentSet.Weka.convertToArray(featureVector)));
+				test.setClassIndex(test.numAttributes() - 1);
+				double[] distr=classifier.distributionForInstance(test.instance(0));
+				if(distr.length!=1)
+					System.out.println("distr. length "+distr.length);
+				out.println(line.split("\t")[0]+"\t"+distr[0]);
+				
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{in.close(); out.close();}
+		
+		System.out.println("Finished classification on nonDuplicates file");
+	}
+
+		/*remember, the last attribute is the classAttribute, which we declare to be numeric
 		This function was derived from developmentSet.Weka in the freebase project.
 		*
 		*/
@@ -185,6 +252,10 @@ public class GPClassifier {
 				att.addElement(new Attribute("feat"+i));
 			att.addElement(new Attribute("classAttribute"));
 			return att;
+		}
+		
+		public Classifier getClassifier(){
+			return classifier;
 		}
 	
 }
